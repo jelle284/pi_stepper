@@ -4,52 +4,54 @@ import time
 PUL = 23
 PPR = 3200
 NONE = 0
-MAX_MSG_LEN = 2000
 
-def make_chunks(steps):
-	N = int(len(steps)/MAX_MSG_LEN) + 1
-	chunks = []
-	for i in range(N):
-		ibegin = MAX_MSG_LEN*i
-		iend   = min(MAX_MSG_LEN*(i+1), len(steps))
-		if ibegin >= iend:
-			break
-		packet = steps[ibegin:iend]
-		wf = []
-		for step in packet:
-			wf.append(pigpio.pulse(1<<PUL, NONE, int(step/2)))
-			wf.append(pigpio.pulse(NONE, 1<<PUL, int(step/2)))
-		chunks.append(wf)
-	return chunks
-	
-def run_motor():
-	coeffs = trajectory.calc_coeffs(20, 10, 5, 6)
-	steps = trajectory.step_trajectory(coeffs, PPR)
+def make_chunks(steps, size=500):
+    N = int(len(steps)/size) + 1
+    chunks = []
+    for i in range(N):
+        ibegin = size*i
+        iend   = min(ibegin+size, len(steps))
+        if ibegin >= iend:
+            break
+        chunk = steps[ibegin:iend]
+        chunks.append(chunk)
+    return chunks
 
-	pi = pigpio.pi()
-	pi.set_mode(PUL, pigpio.OUTPUT)
-	if not pi.connected:
-		sys.exit(1)
-	pi.wave_clear()
-	chunks = make_chunks(steps)
-	t0 = time.time()
-	# timed
-	pi.wave_add_generic(chunks[0])
-	w_now = pi.wave_create()
-	pi.wave_send_once(w_now)
-	for c in chunks[1:]:
-		pi.wave_add_generic(c)
-		w_next = pi.wave_create()
-		pi.wave_send_using_mode(w_next, pigpio.WAVE_MODE_ONE_SHOT_SYNC)
-		while pi.wave_tx_at() == w_now:
-			time.sleep(0.1)
-		pi.wave_delete(w_now)
-		w_now = w_next
-	# /timed
-	elapsed = time.time() - t0
-	tf = coeffs["t"][-1]
-	print(f"took {elapsed} seconds, target was {tf}")
-	pi.stop()
+def make_wf(chunk):
+    wf = []
+    for step in chunk:
+        wf.append(pigpio.pulse(1<<PUL, NONE, int(step/2)))
+        wf.append(pigpio.pulse(NONE, 1<<PUL, int(step/2)))
+    return wf
 
-run_motor()
+def transmit_sync(waveforms):
+    pi = pigpio.pi()
+    pi.set_mode(PUL, pigpio.OUTPUT)
+    assert(pi.connected == 1)
+    # send first wave
+    pi.wave_clear()
+    pi.wave_add_generic(waveforms[0])
+    w_now = pi.wave_create()
+    pi.wave_send_once(w_now)
+    # send consecutive waves
+    for wf in waveforms[1:]:
+        pi.wave_add_generic(wf)
+        w_next = pi.wave_create()
+        pi.wave_send_using_mode(w_next, pigpio.WAVE_MODE_ONE_SHOT_SYNC)
+        while pi.wave_tx_at() == w_now:
+            time.sleep(0.1)
+        pi.wave_delete(w_now)
+        w_now = w_next
+    pi.stop()
+
+def move(distance):
+    coeffs = trajectory.calc_coeffs(distance, 10, 5, 6)
+    steps = trajectory.step_trajectory(coeffs, PPR)
+    chunks = make_chunks(steps)
+    waveforms = [make_wf(chunk) for chunk in chunks]
+    t0 = time.time()
+    transmit_sync(waveforms)
+    elapsed = time.time() - t0
+    tf = coeffs["t"][-1]
+    print(f"took {elapsed} seconds, target was {tf}")
 
