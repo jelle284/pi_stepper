@@ -91,12 +91,12 @@ def eval_piecewise(coeffs, t):
             return q(a,b,c,d,t), qd(a,b,c,t), qdd(a,b,t), qddd(a)
 
 # generate steps for trajectory
-def step_trajectory(coeffs, step_resolution=400):
+def step_trajectory(coeffs, step_resolution):
     steps = []
     tf = coeffs["t"][-1]
     t = 0
     x = 0
-    dt = 0.1
+    dt = 0.005
     while t < tf:
         t += dt
         p, v, a, j = eval_piecewise(coeffs, t)
