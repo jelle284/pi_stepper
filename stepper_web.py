@@ -18,5 +18,5 @@ def index():
 
 @app.route("/move/<pos>")
 def move(pos):
-    motor.move(pos, 10, 20, 60)
+    motor.move(float(pos), 10, 20, 60)
     return redirect("/")
