@@ -25,6 +25,7 @@
 import motor
 
 def main(args):
+    print(args)
     if args:
         pos = float(args[0])
     else:
