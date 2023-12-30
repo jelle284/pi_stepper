@@ -26,20 +26,20 @@ import motor
 
 def main(args):
     print(args)
-    if args:
-        pos = float(args[0])
+    if len(args) > 0:
+        pos = float(args[1])
     else:
         pos = 33
-    if len(args) > 0:
-        vel = float(args[1])
+    if len(args) > 1:
+        vel = float(args[2])
     else:
         vel = 10
-    if len(args) > 1:
-        accel = float(args[2])
+    if len(args) > 2:
+        accel = float(args[3])
     else:
         accel = 20
-    if len(args) > 2:
-        jerk = float(args[3])
+    if len(args) > 3:
+        jerk = float(args[4])
     else:
         jerk = 60
     motor.move(pos, vel, accel, jerk)
