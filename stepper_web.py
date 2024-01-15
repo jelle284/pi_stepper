@@ -31,4 +31,4 @@ def btn_up():
     motor.constant_vel(0)
     return ""
 
-app.run()
+app.run("0.0.0.0", 5000)
