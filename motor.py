@@ -65,6 +65,7 @@ def constant_vel(vel):
         ts = int(1e6/vel)
         wf.append(pigpio.pulse(1<<PUL, NONE, int(ts/2)))
         wf.append(pigpio.pulse(NONE, 1<<PUL, int(ts/2)))
+        pi.wave_add_generic(wf)
         wave = pi.wave_create()
         pi.wave_send_repeat(wave)
     elif vel == 0:
