@@ -20,3 +20,15 @@ def index():
 def move(pos):
     motor.move(float(pos), 10, 20, 60)
     return redirect("/")
+
+@app.route("/down")
+def btn_down():
+    motor.constant_vel(2)
+    return ""
+
+@app.route("/up")
+def btn_up():
+    motor.constant_vel(0)
+    return ""
+
+app.run()

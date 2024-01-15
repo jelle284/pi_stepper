@@ -1,9 +1,20 @@
 <!DOCTYPE html>
 <html>
+<head>Pi Stepper</head>
 <body>
 
-<title>Pi Stepper</title>
 <a href="/move/16"> move quarter turn </a>
+<button onmousedown="btn_down()" onmouseup="btn_up()">"Move"</button>
 
 </body>
+
+<script>
+    function btn_down() {
+        fetch("/down");
+    }
+    function btn_up() {
+        fetch("/up");
+    }
+
+</script>
 </html>

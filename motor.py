@@ -55,3 +55,17 @@ def move(pos, vel=5, accel=10, jerk=20):
     tf = coeffs["t"][-1]
     print(f"took {elapsed} seconds, target was {tf}")
 
+def constant_vel(vel):
+    pi = pigpio.pi()
+    pi.set_mode(PUL, pigpio.OUTPUT)
+    assert(pi.connected == 1)
+    if vel > 0:
+        pi.wave_clear()
+        wf = []
+        ts = int(1e6/vel)
+        wf.append(pigpio.pulse(1<<PUL, NONE, int(ts/2)))
+        wf.append(pigpio.pulse(NONE, 1<<PUL, int(ts/2)))
+        wave = pi.wave_create()
+        pi.wave_send_repeat(wave)
+    elif vel == 0:
+        pi.wave_tx_stop()
