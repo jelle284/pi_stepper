@@ -33,7 +33,7 @@ def btn_up():
     return ""
 
 @app.route("/dir")
-def btn_up():
+def btn_dir():
     persistent["dir"] = not persistent["dir"]
     return ""
 
