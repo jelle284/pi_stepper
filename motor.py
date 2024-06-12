@@ -2,8 +2,8 @@ import trajectory
 import pigpio
 import time
 
-PUL = 26
-
+PUL = 21
+DIR = 20
 PPR = 800
 NONE = 0
 
@@ -53,9 +53,11 @@ def move(pos, vel=5, accel=10, jerk=20):
     waveforms = [make_wf(chunk) for chunk in chunks]
     transmit_sync(waveforms)
 
-def constant_vel(vel):
+def constant_vel(vel, direction=0):
     pi = pigpio.pi()
     pi.set_mode(PUL, pigpio.OUTPUT)
+    pi.set_mode(DIR, pigpio.OUTPUT)
+    pi.write(DIR, direction)
     assert(pi.connected == 1)
     if vel > 0:
         pi.wave_clear()

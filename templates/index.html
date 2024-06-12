@@ -2,9 +2,14 @@
 <html>
 <head>Pi Stepper</head>
 <body>
+<div>
+    <a href="/move/16"> move quarter turn </a>
+</div>
+<div>
+    <button onmousedown="btn_down()" onmouseup="btn_up()">"Move"</button>
+    <button onclick="btn_dir()">"Togge dir"</button>
+</div>
 
-<a href="/move/16"> move quarter turn </a>
-<button onmousedown="btn_down()" onmouseup="btn_up()">"Move"</button>
 
 </body>
 
@@ -15,6 +20,8 @@
     function btn_up() {
         fetch("/up");
     }
-
+    function btn_dir() {
+        fetch("/dir")
+    }
 </script>
 </html>

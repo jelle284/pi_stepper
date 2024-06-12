@@ -9,6 +9,7 @@ from flask import Flask
 from flask import render_template
 from flask import redirect
 
+persistent = {"dir": False}
 
 app = Flask("Pi Stepper")
 
@@ -23,12 +24,17 @@ def move(pos):
 
 @app.route("/down")
 def btn_down():
-    motor.constant_vel(2)
+    motor.constant_vel(2, persistent["dir"])
     return ""
 
 @app.route("/up")
 def btn_up():
-    motor.constant_vel(0)
+    motor.constant_vel(0, persistent["dir"])
+    return ""
+
+@app.route("/dir")
+def btn_up():
+    persistent["dir"] = not persistent["dir"]
     return ""
 
 app.run("0.0.0.0", 5000)
