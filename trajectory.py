@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 30 15:05:59 2023
-
-@author: Jelle
-"""
-
 # equation of motions
 def q(a,b,c,d,t):
     return a/6 * t**3 + b/2 * t**2 + c*t + d
@@ -97,7 +90,7 @@ def step_trajectory(coeffs, step_resolution):
     t = 0
     x = 0
     dt = 0.005
-    while t < tf:
+    while t <= tf:
         t += dt
         p, v, a, j = eval_piecewise(coeffs, t)
         delta = p-x

@@ -1,7 +1,9 @@
 import trajectory
 import pigpio
 import time
-PUL = 23
+
+PUL = 26
+
 PPR = 800
 NONE = 0
 
@@ -39,7 +41,7 @@ def transmit_sync(waveforms):
         w_next = pi.wave_create()
         pi.wave_send_using_mode(w_next, pigpio.WAVE_MODE_ONE_SHOT_SYNC)
         while pi.wave_tx_at() == w_now:
-            time.sleep(0.1)
+            pass
         pi.wave_delete(w_now)
         w_now = w_next
     pi.stop()
@@ -49,11 +51,7 @@ def move(pos, vel=5, accel=10, jerk=20):
     steps = trajectory.step_trajectory(coeffs, PPR)
     chunks = make_chunks(steps)
     waveforms = [make_wf(chunk) for chunk in chunks]
-    t0 = time.time()
     transmit_sync(waveforms)
-    elapsed = time.time() - t0
-    tf = coeffs["t"][-1]
-    print(f"took {elapsed} seconds, target was {tf}")
 
 def constant_vel(vel):
     pi = pigpio.pi()
