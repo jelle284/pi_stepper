@@ -2,8 +2,8 @@ import trajectory
 import pigpio
 import time
 
-PUL = 21
-DIR = 20
+PUL = 16
+DIR = 12
 PPR = 800
 NONE = 0
 
