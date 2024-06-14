@@ -1,15 +1,37 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 29 22:08:29 2023
+###################################################################
+import pigpio
 
-@author: Jelle
-"""
-import motor
+PUL = (16)
+DIR = (12)
+NONE = 0
+PPR = 800
+CONST_VEL = 2
+
+def constant_vel(axis, direction=0):
+    if axis < 0 or axis >= len(PUL): return
+    pi = pigpio.pi()
+    pi.set_mode(PUL[axis], pigpio.OUTPUT)
+    pi.set_mode(DIR[axis], pigpio.OUTPUT)
+    pi.write(DIR[axis], direction)
+    assert(pi.connected == 1)
+    pi.wave_clear()
+    wf = []
+    ts = int(1e6/(CONST_VEL*PPR))
+    wf.append(pigpio.pulse(1<<PUL[axis], NONE, int(ts/2)))
+    wf.append(pigpio.pulse(NONE, 1<<PUL[axis], int(ts/2)))
+    pi.wave_add_generic(wf)
+    wave = pi.wave_create()
+    pi.wave_send_repeat(wave)
+
+def stop():
+    pi = pigpio.pi()
+    assert(pi.connected == 1)
+    pi.wave_tx_stop()
+    
+#########################################################################
 from flask import Flask
 from flask import render_template
 from flask import redirect
-
-persistent = {"dir": False}
 
 app = Flask("Pi Stepper")
 
@@ -17,24 +39,19 @@ app = Flask("Pi Stepper")
 def index():
     return render_template('index.html')
 
-@app.route("/move/<pos>")
-def move(pos):
-    motor.move(float(pos), 10, 20, 60)
-    return redirect("/")
-
-@app.route("/down")
-def btn_down():
-    motor.constant_vel(2, persistent["dir"])
+@app.route("/fwd/<axis>")
+def btn_down(axis=0):
+    constant_vel(axis)
     return ""
 
-@app.route("/up")
+@app.route("/rev/<axis>")
+def btn_down(axis=0):
+    constant_vel(axis, direction=1)
+    return ""
+
+@app.route("/stop")
 def btn_up():
-    motor.constant_vel(0, persistent["dir"])
-    return ""
-
-@app.route("/dir")
-def btn_dir():
-    persistent["dir"] = not persistent["dir"]
+    stop()
     return ""
 
 app.run("0.0.0.0", 5000)

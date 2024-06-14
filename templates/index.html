@@ -1,27 +1,55 @@
 <!DOCTYPE html>
 <html>
-<head>Pi Stepper</head>
-<body>
-<div>
-    <a href="/move/16"> move quarter turn </a>
-</div>
-<div>
-    <button onmousedown="btn_down()" onmouseup="btn_up()">"Move"</button>
-    <button onclick="btn_dir()">"Togge dir"</button>
-</div>
-
-
-</body>
+    <head>
+        <style>
+            body {
+                background-color: powderblue;
+            }
+            h1 {
+                color: blue;
+            }
+            p {
+                color: darkblue;
+            }
+            button {
+                background-color: #04AA6D; /* Green */
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="axis-container">
+            <p>Axis 1</p>
+            <button onmousedown="axis_fwd(0)" onmouseup="axis_stop()">CW</button>
+            <button onmousedown="axis_rev(0)" onmouseup="axis_stop()">CCW</button>
+        </div>
+        <div class="axis-container">
+            <p>Axis 2</p>
+            <button onmousedown="axis_fwd(1)" onmouseup="axis_stop()">Up</button>
+            <button onmousedown="axis_rev(1)" onmouseup="axis_stop()">Down</button>
+        </div>
+        <div class="axis-container">
+            <p>Axis 3</p>
+            <button onmousedown="axis_fwd(2)" onmouseup="axis_stop()">Up</button>
+            <button onmousedown="axis_rev(2)" onmouseup="axis_stop()">Down</button>
+        </div>
+    </body>
+</html>
 
 <script>
-    function btn_down() {
-        fetch("/down");
+    function axis_fwd(axis) {
+        fetch("/fwd/" + axis);
     }
-    function btn_up() {
-        fetch("/up");
+    function axis_rev(axis) {
+        fetch("/rev/" + axis);
     }
-    function btn_dir() {
-        fetch("/dir")
+    function axis_stop() {
+        fetch("/stop")
     }
 </script>
-</html>
