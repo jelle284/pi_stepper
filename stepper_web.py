@@ -39,12 +39,12 @@ app = Flask("Pi Stepper")
 def index():
     return render_template('index.html')
 
-@app.route("/fwd/<axis>")
+@app.route("/fwd/<int:axis>")
 def fwd(axis=0):
     constant_vel(axis)
     return ""
 
-@app.route("/rev/<axis>")
+@app.route("/rev/<int:axis>")
 def rev(axis=0):
     constant_vel(axis, direction=1)
     return ""
