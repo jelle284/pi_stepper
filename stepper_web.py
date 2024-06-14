@@ -23,7 +23,7 @@ def constant_vel(axis, direction=0):
     wave = pi.wave_create()
     pi.wave_send_repeat(wave)
 
-def stop():
+def stop_all():
     pi = pigpio.pi()
     assert(pi.connected == 1)
     pi.wave_tx_stop()
@@ -40,18 +40,18 @@ def index():
     return render_template('index.html')
 
 @app.route("/fwd/<axis>")
-def btn_down(axis=0):
+def fwd(axis=0):
     constant_vel(axis)
     return ""
 
 @app.route("/rev/<axis>")
-def btn_down(axis=0):
+def rev(axis=0):
     constant_vel(axis, direction=1)
     return ""
 
 @app.route("/stop")
-def btn_up():
-    stop()
+def stop():
+    stop_all()
     return ""
 
 app.run("0.0.0.0", 5000)
