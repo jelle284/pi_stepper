@@ -7,13 +7,14 @@ NONE = 0
 PPR = 800
 CONST_VEL = 2
 
+pi = pigpio.pi()
+
+for pin in PUL+DIR:
+    pi.set_mode(pin, pigpio.OUTPUT)
+
 def constant_vel(axis, direction=0):
     if axis < 0 or axis >= len(PUL): return
-    pi = pigpio.pi()
-    pi.set_mode(PUL[axis], pigpio.OUTPUT)
-    pi.set_mode(DIR[axis], pigpio.OUTPUT)
     pi.write(DIR[axis], direction)
-    assert(pi.connected == 1)
     pi.wave_clear()
     wf = []
     ts = int(1e6/(CONST_VEL*PPR))
@@ -22,11 +23,6 @@ def constant_vel(axis, direction=0):
     pi.wave_add_generic(wf)
     wave = pi.wave_create()
     pi.wave_send_repeat(wave)
-
-def stop_all():
-    pi = pigpio.pi()
-    assert(pi.connected == 1)
-    pi.wave_tx_stop()
     
 #########################################################################
 from flask import Flask
@@ -34,6 +30,8 @@ from flask import render_template
 from flask import redirect
 
 app = Flask("Pi Stepper")
+
+state=0
 
 @app.route("/")
 def index():
@@ -46,12 +44,17 @@ def fwd(axis=0):
 
 @app.route("/rev/<int:axis>")
 def rev(axis=0):
-    constant_vel(axis, direction=1)
+    global state
+    if state == 0:
+        state = 1
+        constant_vel(axis, direction=1)
     return ""
 
 @app.route("/stop")
 def stop():
-    stop_all()
+    pi.wave_tx_stop()
+    global state
+    state=0
     return ""
 
 app.run("0.0.0.0", 5000)
