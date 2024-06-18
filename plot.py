@@ -17,7 +17,7 @@ def make_chunks(steps, size=1000):
 
 res = 800
 
-coef = trajectory.calc_coeffs(20)
+coef = trajectory.SCurve(20)
 
 steps = trajectory.step_trajectory(coef, res)
 #########################################
@@ -37,12 +37,12 @@ plt.plot(Ts, Ps, label="steps")
 n=1000
 Pp = []
 Tp = []
-tf = coef["t"][-1]
+tf = coef.t[-1]
 for i in range(n):
     tp = i*tf/n
-    pp = trajectory.eval_piecewise(coef, tp)
+    pp = coef(tp)
     Tp.append(tp)
-    Pp.append(pp[0])
+    Pp.append(pp)
     
 plt.plot(Tp, Pp, label="poly")
 
