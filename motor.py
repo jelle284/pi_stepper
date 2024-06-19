@@ -1,22 +1,11 @@
+
 import trajectory
 import pigpio
 import time
 
-PUL = 16
+PUL = (21,16,19)
 PPR = 800
 NONE = 0
-
-def make_chunks(steps, size=1000):
-    N = int(len(steps)/size) + 1
-    chunks = []
-    for i in range(N):
-        ibegin = size*i
-        iend   = min(ibegin+size, len(steps))
-        if ibegin >= iend:
-            break
-        chunk = steps[ibegin:iend]
-        chunks.append(chunk)
-    return chunks
 
 def make_wf(chunk):
     wf = []
@@ -44,10 +33,3 @@ def transmit_sync(waveforms):
         pi.wave_delete(w_now)
         w_now = w_next
     pi.stop()
-
-def move(pos, vel=5, accel=10, jerk=20):
-    coeffs = trajectory.calc_coeffs(pos, jerk, accel, vel)
-    steps = trajectory.step_trajectory(coeffs, PPR)
-    chunks = make_chunks(steps)
-    waveforms = [make_wf(chunk) for chunk in chunks]
-    transmit_sync(waveforms)

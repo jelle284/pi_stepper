@@ -1,5 +1,5 @@
-# equation of motions
 
+# equation of motions
 def q(a,b,c,d,t):
     return a/6 * t**3 + b/2 * t**2 + c*t + d
 def qd(a,b,c,t):
@@ -8,54 +8,6 @@ def qdd(a,b,t):
     return a*t+b
 def qddd(a):
     return a
-
-
-# generate steps for trajectory
-def step_trajectory(traj, step_resolution):
-    steps = []
-    tf = traj.t[-1]
-    t = 0
-    x = 0
-    dt = 0.1
-    while t <= tf:
-        t += dt
-        p = traj(t)
-        delta = p-x
-        n_steps = int(delta*step_resolution)
-        x += n_steps/step_resolution
-        for i in range(n_steps):
-            steps.append(1e6*dt/n_steps)
-    return steps
-
-# partial step generation
-def step(tbegin, tend, axis, dt=0.01, step_resolution=800):
-    t = tbegin
-    x = axis(t)
-    steps = []
-    while t <= tend:
-        t += dt
-        p = axis(t)
-        delta = p-x
-        n_steps = int(delta*step_resolution)
-        x += n_steps/step_resolution
-        for i in range(n_steps):
-            steps.append(1e6*dt/n_steps)
-    return steps
-
-import math
-
-def move(path, divs, res=800):
-    x = 0
-    retval = []
-    dt = path.duration/divs
-    for i in range(divs):
-        t = (i+1)*dt
-        delta = path(t) - x
-        nsteps = math.floor(delta*res)
-        pulsewidth = dt/nsteps
-        x += nsteps / res
-        retval.append((nsteps, pulsewidth))
-    return retval
 
 class SCurve:
     def __init__(self, qf, jmax=20, amax=10, vmax=5):
@@ -128,3 +80,17 @@ class SCurve:
                 c = self.c[i]
                 d = self.d[i]
                 return q(a,b,c,d,t)
+
+        
+def move(path, dt=0.1, res=800):
+    x = 0
+    retval = []
+    divs = int(path.duration/dt)
+    for i in range(divs):
+        t = (i+1)*dt
+        delta = path(t) - x
+        nsteps = int(delta*res)
+        pulsewidth = dt/nsteps
+        x += nsteps / res
+        retval.append((nsteps, pulsewidth))
+    return retval
