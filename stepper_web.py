@@ -28,7 +28,7 @@ def constant_vel(axis, direction=0):
     
 def multimove(M1, M2):
     first = True
-    pi.wave_clear()
+    #pi.wave_clear()
     for M in zip_longest(M1, M2):
         idx=0
         for m in M:
