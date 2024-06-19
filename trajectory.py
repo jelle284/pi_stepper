@@ -16,7 +16,7 @@ def step_trajectory(traj, step_resolution):
     tf = traj.t[-1]
     t = 0
     x = 0
-    dt = 0.005
+    dt = 0.1
     while t <= tf:
         t += dt
         p = traj(t)
@@ -26,6 +26,36 @@ def step_trajectory(traj, step_resolution):
         for i in range(n_steps):
             steps.append(1e6*dt/n_steps)
     return steps
+
+# partial step generation
+def step(tbegin, tend, axis, dt=0.01, step_resolution=800):
+    t = tbegin
+    x = axis(t)
+    steps = []
+    while t <= tend:
+        t += dt
+        p = axis(t)
+        delta = p-x
+        n_steps = int(delta*step_resolution)
+        x += n_steps/step_resolution
+        for i in range(n_steps):
+            steps.append(1e6*dt/n_steps)
+    return steps
+
+import math
+
+def move(path, divs, res=800):
+    x = 0
+    retval = []
+    dt = path.duration/divs
+    for i in range(divs):
+        t = (i+1)*dt
+        delta = path(t) - x
+        nsteps = math.floor(delta*res)
+        pulsewidth = dt/nsteps
+        x += nsteps / res
+        retval.append((nsteps, pulsewidth))
+    return retval
 
 class SCurve:
     def __init__(self, qf, jmax=20, amax=10, vmax=5):
@@ -80,7 +110,8 @@ class SCurve:
         self.c = c
         self.d = d
         self.t = t
-    
+        self.duration=t[-1]
+        
     def __call__(self, t):
         if t <= 0:
             return 0

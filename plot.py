@@ -1,26 +1,29 @@
 import trajectory
-from matplotlib import legend, pyplot as plt
+from matplotlib import pyplot as plt
 
 #########################################
-def make_chunks(steps, size=1000):
-    N = int(len(steps)/size) + 1
-    chunks = []
-    for i in range(N):
-        ibegin = size*i
-        iend   = min(ibegin+size, len(steps))
-        if ibegin >= iend:
-            break
-        chunk = steps[ibegin:iend]
-        chunks.append(chunk)
-    return chunks
-
-
-res = 800
-
 coef = trajectory.SCurve(20)
+tfinal = coef.t[-1]
 
-steps = trajectory.step_trajectory(coef, res)
 #########################################
+# using polynomial evaluation
+n=1000
+Pp = []
+Tp = []
+
+for i in range(n):
+    tp = i*tfinal/n
+    pp = coef(tp)
+    Tp.append(tp)
+    Pp.append(pp)
+    
+plt.plot(Tp, Pp, label="poly")
+
+#########################################
+# using full steps list
+res = 800
+steps = trajectory.step_trajectory(coef, res)
+
 Ps = []
 ps = 0
 Ts = []
@@ -34,19 +37,19 @@ for s in steps:
 
 plt.plot(Ts, Ps, label="steps")
 #########################################
-n=1000
-Pp = []
-Tp = []
-tf = coef.t[-1]
-for i in range(n):
-    tp = i*tf/n
-    pp = coef(tp)
-    Tp.append(tp)
-    Pp.append(pp)
-    
-plt.plot(Tp, Pp, label="poly")
+# using chunks
+def make_chunks(steps, size=1000):
+    N = int(len(steps)/size) + 1
+    chunks = []
+    for i in range(N):
+        ibegin = size*i
+        iend   = min(ibegin+size, len(steps))
+        if ibegin >= iend:
+            break
+        chunk = steps[ibegin:iend]
+        chunks.append(chunk)
+    return chunks
 
-#########################################
 Pc = []
 pc = 0
 Tc = []
@@ -61,6 +64,27 @@ for c in chunks:
 
 plt.plot(Tc, Pc, "r--", label="chunks")
 
+#########################################
+# using partial time stepping
+Pt = []
+pt = 0
+Tt = []
+tt = 0
+
+moves = trajectory.move(coef, 20)
+
+for m in moves:
+    ns, pw = m
+    for s in range(ns):
+        pt = pt + 1 / res
+        tt = tt + pw
+        Pt.append(pt)
+        Tt.append(tt)
+        
+plt.plot(Tt, Pt, "k--", label="partial")
+
+##########################################
+# show figure
 plt.grid()
 plt.legend()
 plt.show()
