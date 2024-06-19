@@ -1,23 +1,21 @@
 
 import trajectory
 import pigpio
-import time
 
 PUL = (21,16,19)
 PPR = 800
 NONE = 0
 
-def make_wf(chunk):
+
+def make_wf(steps, ax):
     wf = []
-    for step in chunk:
-        wf.append(pigpio.pulse(1<<PUL, NONE, int(step/2)))
-        wf.append(pigpio.pulse(NONE, 1<<PUL, int(step/2)))
+    for step in steps:
+        wf.append(pigpio.pulse(1<<PUL[ax], NONE, int(step/2)))
+        wf.append(pigpio.pulse(NONE, 1<<PUL[ax], int(step/2)))
     return wf
 
 def transmit_sync(waveforms):
     pi = pigpio.pi()
-    pi.set_mode(PUL, pigpio.OUTPUT)
-    assert(pi.connected == 1)
     # send first wave
     pi.wave_clear()
     pi.wave_add_generic(waveforms[0])
@@ -32,4 +30,18 @@ def transmit_sync(waveforms):
             pass
         pi.wave_delete(w_now)
         w_now = w_next
-    pi.stop()
+
+def move(pos, vel, accel, jerk):
+    pi = pigpio.pi()
+    assert(pi.connected == 1)
+
+    for pin in PUL:
+        pi.set_mode(pin, pigpio.OUTPUT)
+        pi.write(pin, 0)
+    
+    path = trajectory.SCurve(pos, jerk, accel, vel)
+    move = trajectory.move(path)
+
+    wfs = [make_wf([pw]*ns, 0) for pw, ns in move]
+    transmit_sync(wfs)
+    

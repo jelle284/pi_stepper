@@ -9,7 +9,6 @@ PPR = 800
 CONST_VEL = 2
 
 pi = pigpio.pi()
-
 for pin in PUL+DIR:
     pi.set_mode(pin, pigpio.OUTPUT)
     pi.write(pin, 0)
@@ -49,7 +48,6 @@ def multimove(M1, M2):
             pass
         pi.wave_delete(w_now)
         w_now = w_next
-        pi.stop()
         
 #########################################################################
 from flask import Flask
