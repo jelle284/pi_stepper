@@ -84,8 +84,8 @@ def stop():
     state=0
     return ""
 
-@app.route("/multimove")
-def multimove():
+@app.route("/control")
+def control():
     global state
     state = 1
     c1 = trajectory.SCurve(10)
