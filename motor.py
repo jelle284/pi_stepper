@@ -42,6 +42,6 @@ def move(pos, vel, accel, jerk):
     path = trajectory.SCurve(pos, jerk, accel, vel)
     move = trajectory.move(path)
 
-    wfs = [make_wf([pw]*ns, 0) for pw, ns in move]
+    wfs = [make_wf([pw]*ns, 0) for ns, pw in move]
     transmit_sync(wfs)
     

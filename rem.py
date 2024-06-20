@@ -11,10 +11,7 @@ assert(pi.connected == 1)
 pi.wave_clear()
 
 for pin, nsteps, delayus in moves:
-    wf = []
-    for n in range(nsteps):
-        wf.append(pigpio.pulse(pin, 0, int(delayus/2)))
-        wf.append(pigpio.pulse(0, pin, int(delayus/2)))
+    wf = [pigpio.pulse(pin, 0, int(delayus/2)), pigpio.pulse(0, pin, int(delayus/2))]*n_steps
     pi.wave_add_generic(wf)
     
 wid = pi.wave_create()
