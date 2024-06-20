@@ -21,7 +21,7 @@ for i in range(56):
         wold = wid
         first = False
         continue
-    pi.wave_send_using_mode(pigpio.WAVE_MODE_ONE_SHOT_SYNC)
+    pi.wave_send_using_mode(wid, pigpio.WAVE_MODE_ONE_SHOT_SYNC)
     while pi.wave_tx_at == wold:
         time.sleep(0.01)
     pi.wave_delete(wold)
