@@ -38,11 +38,11 @@ def multimove(M1, M2):
             pi.wave_add_generic(wf)
             idx+=1
         if first:
-            w_now = pi.wave_create()
+            w_now = pi.wave_create_and_pad(25)
             pi.wave_send_once(w_now)
             first = False
             continue
-        w_next = pi.wave_create()
+        w_next = pi.wave_create_and_pad(25)
         pi.wave_send_using_mode(w_next, pigpio.WAVE_MODE_ONE_SHOT_SYNC)
         while pi.wave_tx_at() == w_now:
             pass
