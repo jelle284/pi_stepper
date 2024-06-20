@@ -19,12 +19,12 @@ def transmit_sync(waveforms):
     # send first wave
     pi.wave_clear()
     pi.wave_add_generic(waveforms[0])
-    w_now = pi.wave_create()
+    w_now = pi.wave_create_and_pad(25)
     pi.wave_send_once(w_now)
     # send consecutive waves
     for wf in waveforms[1:]:
         pi.wave_add_generic(wf)
-        w_next = pi.wave_create()
+        w_next = pi.wave_create_and_pad(25)
         pi.wave_send_using_mode(w_next, pigpio.WAVE_MODE_ONE_SHOT_SYNC)
         while pi.wave_tx_at() == w_now:
             pass
